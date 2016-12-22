@@ -1,0 +1,68 @@
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+template<class Object>
+class Node{
+public:
+    Object data;
+    Node* next;
+    Node( const Object & d = Object{}, Node* n = nullptr):data{d},next{n}{}
+    Node(Object&& d, Node* n = nullptr): data{std::move(d)}, next{n}{}
+};
+
+template<class Object>
+class Queue{
+    public:
+        Queue () : head(nullptr), tail(nullptr) {}
+
+        ~Queue() {
+            while ( !empty() )
+                dequeue();
+            return;
+        }
+
+        Object & front() {
+            if ( empty() )
+                throw underflow_error("queue empty");
+            return head->data; 
+        }         
+
+        const Object & front() const {
+            return front();
+        }
+
+        Object & back() {
+            if ( empty() )
+                throw underflow_error("queue empty");
+            return tail->data;
+        }
+
+        const Object & back() const {
+            return back();
+        }
+
+        void enqueue(Object obj) {
+            if ( empty() ) {
+                head = new Node<Object> ( obj );
+                tail = head;
+            } else {
+                tail->next = new Node<Object>( obj ); 
+                tail = tail->next;
+            }
+        }
+
+        void dequeue() {
+            if ( !empty() ){
+                Node<Object>* tmp = head;
+                head = head->next;
+                delete tmp;
+            }
+        }
+
+        const bool empty() const {
+            return (head == nullptr);
+        }
