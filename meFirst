@@ -1,0 +1,21 @@
+class Student {
+private:
+	string name;
+	double gpa;
+public:
+	Student(const string& name, double gpa) :name(name), gpa(gpa) {}
+	string get_name() const { return name; }
+	double get_gpa() const { return gpa; }
+};
+
+class meFirst {
+public:
+	meFirst(const string& str) : me(str) {}
+	bool operator() (const Student& rhs, const Student& lhs) {
+		if (rhs.get_name() == me) return true;
+		if (lhs.get_name() == me) return false;
+		return rhs.get_name() < lhs.get_name();
+	}
+private:
+	string me;
+};
