@@ -1,0 +1,101 @@
+#define CATCH_CONFIG_MAIN
+#include<math.h>
+#include "catch.hpp"
+#include<iostream>
+#include <string>
+
+using namespace std;
+class IntArray {
+public:
+	IntArray(int n = 0) : size(n), array(new int[n]) {}
+	// add your methods here
+	//Copy Constructor 
+	IntArray(const IntArray& rhs);
+
+	//Copy Assignment Operator 
+	IntArray& operator=(const IntArray& rhs);
+
+	//Move Constructor 
+	IntArray(IntArray&& rhs);
+
+	//Move Assignment Operator 
+	IntArray& operator=(IntArray&& rhs);
+
+	//Destructor 
+	~IntArray();
+
+	void put(int  i, int value);
+	int get(int i);
+	int* getArray();
+private:
+	int * array;
+	int size;
+};
+
+//Copy Constructor 
+IntArray::IntArray(const IntArray& rhs) {
+	size = rhs.size;
+	array = new int[size];
+	for (int i = 0; i < size; i++) {
+		array[i] = rhs.array[i];
+	}
+}
+//Move Constructor 
+IntArray::IntArray(IntArray&& rhs) {
+	size = rhs.size;
+	array = rhs.array;
+	rhs.array = nullptr;
+	rhs.size = 0;
+}
+//Copy Assignment Operator 
+IntArray& IntArray::operator=(const IntArray& rhs) {
+	//self check 
+	//Delete what's already in the memory 
+	//copy over 
+	if (this != &rhs) {
+		size = rhs.size;
+		delete[] array; //EDIT SINCE THE LAST POST
+		array = new int[size];
+		for (int i = 0; i < size; i++) {
+			array[i] = rhs.array[i];
+		}
+	}
+
+	//return
+	return *this;
+}
+//Move Assignment Operator 
+IntArray& IntArray::operator=(IntArray&& rhs) {
+	if (this != &rhs) {
+		size = rhs.size;
+		delete[] array;
+		array = rhs.array;
+		rhs.size = 0;
+		rhs.array = nullptr;
+	}
+	return *this;
+}
+
+//Destructor 
+IntArray:: ~IntArray() {
+	size = 0;
+	delete[] array;
+}
+
+void IntArray::put(int i, int value) {
+	if (0 <= i && i < size) {
+		*(array + i) = value;
+	}
+}
+
+int IntArray::get(int i) {
+	if (0 <= i && i < size) {
+		return *(array + i);
+	}
+	return 0;
+}
+
+
+int* IntArray::getArray() {
+	return array;
+}
