@@ -1,0 +1,10 @@
+template <class Comparable>
+void print_kth_largest(const vector<Comparable>& a, int k) {
+	// First, use the ranged constructor for the priority queue (takes O(n) time)
+	priority_queue<Comparable> pq(a.begin(), a.end());
+	// Print-and-pop front element (takes O(k*log n) time)
+	for (int i = 0; i < k; i++) {
+		cout << pq.top() << endl;
+		pq.pop();
+	}
+}
