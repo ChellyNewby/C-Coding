@@ -140,3 +140,194 @@ public:
     {
         insert( std::move( x ), root );
     }
+    
+      void rangedPrint( const Comparable &low, const Comparable &high ) const {
+        try {
+            if ( high < low )
+                throw 1;
+        } catch(int& e) {
+            cout << e << "Incorrect Bounds!" << endl;
+            return;
+        }
+        printRange( low, high, root );
+    }
+
+    /**
+     * Input: Called on a BST
+     * Result: Turns BST into a stringy tree
+     */
+    void stringy() {
+        if ( root == nullptr ) return;
+        root = stringy( root ).first;
+    } 
+
+    void printRightPath() {
+        Node* r = root;
+        while ( r != nullptr ) {
+            cout << r->element << endl;
+            cout << right << endl;
+            r = r->right;
+        }
+    }
+
+    void levelOrderTraversal() {
+        queue<Node *> q;
+        Node * current = root;
+        q.push( current );
+        while ( !q.empty() ) {
+            current = q.front();
+            cout << current->element << " ";
+            if ( current->left != nullptr )
+                q.push( current->left );
+            if ( current->right != nullptr )
+                q.push( current->right );
+            q.pop();
+        }
+        cout << endl;
+    }
+
+    float average_node_depth() {
+        pair<int, int> p = average_node_depth( root, 0 );
+        return ((float) p.second) / p.first;
+    }
+   
+private:
+    
+    BinaryNode<Comparable> *root;
+    
+    /**
+     * Internal method to insert into a subtree.
+     * x is the item to insert.
+     * t is the node that roots the subtree.
+     * Set the new root of the subtree.
+     */
+    void insert( const Comparable & x, Node * & t )
+    {
+        if( t == nullptr )
+            t = new Node{ x, nullptr, nullptr };
+        else if( x < t->element )
+            insert( x, t->left );
+        else if( t->element < x )
+            insert( x, t->right );
+        else
+            ;  // Duplicate; do nothing
+    }
+    
+    /**
+     * Internal method to insert into a subtree.
+     * x is the item to insert.
+     * t is the node that roots the subtree.
+     * Set the new root of the subtree.
+     */
+    void insert( Comparable && x, Node * & t )
+    {
+        if( t == nullptr )
+            t = new Node{ std::move( x ), nullptr, nullptr };
+        else if( x < t->element )
+            insert( std::move( x ), t->left );
+        else if( t->element < x )
+            insert( std::move( x ), t->right );
+        else
+            ;  // Duplicate; do nothing
+    }
+    
+    /**
+     * Internal method to make subtree empty.
+     */
+    void makeEmpty( Node * & t )
+    {
+        if( t != nullptr )
+        {
+            makeEmpty( t->left );
+            makeEmpty( t->right );
+            delete t;
+        }
+        t = nullptr;
+    }
+    
+    
+    /**
+     * Internal method to clone subtree.
+     */
+    Node * clone( Node *t ) const
+    {
+        if( t == nullptr )
+            return nullptr;
+        else
+            return new Node{ t->element, clone( t->left ), clone( t->right ) };
+    }
+    
+    bool contains( const Comparable & x, const Node * t ) const {
+        if ( t == nullptr )
+            return false;
+        if ( t->element == x )
+           return true; 
+        if ( t->element < x )
+            return contains( x, t->right );
+        return contains( x, t->left );
+    }
+
+    void printRange( const Comparable &low, const Comparable &high, const Node * t ) const {
+        if ( t == nullptr )
+            return;
+        if ( t->element > high ) {
+            printRange( low, high, t->left );
+            return;
+        }
+        if ( t->element < low ) {
+            printRange( low, high, t->right );
+            return;
+        }
+        printRange( low, high, t->left );
+        cout << t->element << endl;
+        printRange( low, high, t->right );
+        return;
+    }
+
+    /**
+     * Input: the root node t to a BST
+     * Returns: tail node to the stringy tree made from BST
+     **/
+
+    NodePair stringy( Node* t)
+    {
+        if ( t->left == nullptr && t->right == nullptr )
+            return { t, t };
+        if ( t->left == nullptr ) {
+            NodePair r = stringy( t->right );
+            t->right = r.first;
+            return { t, r.second };
+        }
+        if ( t->right == nullptr ) {
+            NodePair l = stringy( t->left );
+            l.second->right = t;
+            t->left = nullptr;
+            return { l.first, t};
+        }
+        NodePair l = stringy( t->left  );
+        NodePair r = stringy( t->right );
+        l.second->right = t;
+        t->left = nullptr;
+        t->right = r.first;
+        return { l.first, r.second };
+    }   
+
+    pair<int, int> average_node_depth( Node * t, int d ) { // size, depth
+        if ( t->left == nullptr && t->right == nullptr )
+            return pair<int, int>( 1, d );
+        if ( t->left == nullptr ) {
+            pair<int, int> r = average_node_depth( t->right, d+1 );
+            r.first = r.first + 1; r.second = r.second + d;
+            return r;
+        }
+        if ( t->right == nullptr ) {
+            pair<int, int> l = average_node_depth( t->left, d+1 );
+            l.first = l.first + 1; l.second = l.second + d;
+            return l;
+        }
+        pair<int, int> l = average_node_depth( t->left, d+1 );
+        pair<int, int> r = average_node_depth( t->right, d+1 );
+        l.first += r.first + 1; l.second += r.second + d;
+        return l;
+    }
+};
