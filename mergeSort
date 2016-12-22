@@ -1,0 +1,21 @@
+template <class TmpItr, class RandItr>
+void mergeSort(TmpItr tmpBegin, RandItr start, RandItr end) {
+	if (start + 1 != end) {
+		int cent = (end - start) / 2;
+		mergeSort(tmpBegin, start, start + cent);
+		mergeSort(tmpBegin + cent, start + cent, end);
+		merge(start, start + cent, start + cent, end, tmpBegin);
+		copy(tmpBegin, tmpBegin + (end - start), start);
+		// Instead of calling STL's copy(), you could have manually
+		// copied over the elements from the temp array as well!
+	}
+}
+template<class RandItr>
+void mergeSort(RandItr start, RandItr end) {
+	int  sz = end - start;  // or use auto sz = end-start;
+							//typedef typename iterator_traits< RandItr >::value_type Object; //Xcode
+	typedef  iterator_traits< RandItr >::value_type Object; //Other compilers
+
+	vector<Object> tmp(sz);
+	mergeSort(tmp.begin(), start, end);
+}
