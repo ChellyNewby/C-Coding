@@ -1,0 +1,57 @@
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+#include <iostream>
+#include <map>
+#include <vector>
+#include <fstream>
+#include <sstream>
+using namespace std;
+
+// Define the ASCII numbers for A - Z
+#define ASCIIUPPEROFFSET 65
+#define ASCIIUPPERLIMIT 90
+
+// Define the ASCII numbers for a - z
+#define ASCIILOWEROFFSET 97
+#define ASCIILOWERLIMIT 122
+
+// Get point values from the file and store them in the vector
+void initValues (vector<int>& pointValues) {
+    ifstream pointFile("Letter_point_value.txt");
+    if (!pointFile) {
+        cerr << "Point file does not exist!" << endl;
+        exit(1);
+    }
+    string line;
+    while (getline(pointFile, line)) {
+        int value; 
+        char letter;
+        stringstream valueLine(line);
+        valueLine >> value;
+        valueLine >> letter >> letter;
+        int asciival = (int)letter;
+        if (asciival > ASCIIUPPEROFFSET - 1 && asciival < ASCIIUPPERLIMIT + 1) 
+            pointValues[asciival-ASCIIUPPEROFFSET] = value;
+    }
+}
+
+// Compute point value of a word
+int wordValue (const vector<int>& pointValues, const string& word) {
+    int value = 0;
+    for (char a : word)
+        if ( (int)a > ASCIILOWEROFFSET - 1 && (int)a < ASCIILOWERLIMIT + 1)
+            value += pointValues[ (int)a - ASCIILOWEROFFSET ];
+    return value;
+}
+
+// Store all words and their point values in the map
+void initWords (const vector<int>& pointValues, map<string, int>& wordValues) {
+    ifstream wordFile("ENABLE.txt");
+    if (!wordFile) {
+        cerr << "Word file does not exist!" << endl;
+        exit(1);
+    }
+    string line;
+    while (getline(wordFile, line))
+        wordValues.insert({line, wordValue(pointValues, line)});
+}
