@@ -1,0 +1,86 @@
+#define CATCH_CONFIG_MAIN
+#include<istream>
+#include "Tokenizer.cpp"
+#include "catch.hpp"
+
+using namespace std;
+
+// Code from Weiss
+// Symbol is the class that will be placed on the Stack.
+struct Symbol
+{
+    char token;
+    int  theLine;
+
+};
+
+
+class Balance
+{
+public:
+    Balance( istream & is ):tok( is ),errors( 0 ){}
+    int checkBalance(); // returns the number of mismatched parenthesis
+private:
+    Tokenizer tok;
+    int errors;
+    void checkMatch( const Symbol & oParen, const Symbol & cParen );   
+};
+
+int Balance::checkBalance(){
+	// we have to loop through and get all the open and close parenthesis and we will use our tok class
+	char bracket;// hold the value that the tokenizer class will return
+	stack<Symbol> bracketStack; // used to push the open brackets on the stack
+	while ((bracket = tok.getNextOpenClose()) != '\0'){ // loop through while we don't hit the end of the line
+
+		// if it's an open bracket, push it onto the stack
+		if (bracket == '(' || bracket == '[' || bracket == '{'){
+			Symbol p; // make a temp
+			p.token = bracket; // add the bracket type to the struct instance
+			p.theLine = tok.getLineNumber(); // also store the line number which will be used to output the error mssg
+			bracketStack.push(p);
+		}
+		// else if this is a close bracket
+		else if(bracket == ')' || bracket == ']' || bracket == '}'){
+			// First we check if the stack is empty, if it is, we will output a error mssg and increase the error count
+			if (bracketStack.empty()){
+				cout << "Error ExtraClose: closing bracket found without an open at line "<<tok.getLineNumber()<<endl;
+				errors++;// increment error count
+			}
+			else{
+			// else we will have to call our check balance method and pass this bracket and the topmost element on our stack
+				Symbol closingBrac; // make a symbol type and pass it into check match. Could have added a constructor sigh and make it easier
+				closingBrac.token = bracket;
+				closingBrac.theLine = tok.getLineNumber();
+				checkMatch(bracketStack.top(), closingBrac); //  this method will check if the top two brackets are mismatched or not
+				bracketStack.pop(); // pop the element off
+			}
+
+		}
+		
+	}
+
+	// finally check if we have any open brackets left, if we do, output an error mssg for each
+	while (!bracketStack.empty()){
+		Symbol top = bracketStack.top(); 
+		cout << "Error Extra Open: open bracket found without it's closing at line "<<top.theLine<<endl;
+		bracketStack.pop();
+		errors++; //increment the error count
+	}
+
+	return errors;
+}
+
+void Balance::checkMatch(const Symbol & oParen, const Symbol & cParen ){
+
+	// if balanced, simpy return
+	if ((oParen.token == '(' && cParen.token == ')') 
+		|| (oParen.token == '[' || cParen.token == ']') 
+		|| (oParen.token == '{'&& cParen.token == '}'))
+		return;
+
+	// else output an error message
+	cout <<"Error Mismatch: We encountered a unbalanced bracket pair: ";
+	cout << oParen.token<<" occured at line "<<oParen.theLine<< " and " << cParen.token<<" occured at line "<<cParen.theLine<<endl;
+	errors++;// increment the error count
+
+}
