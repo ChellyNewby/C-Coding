@@ -1,0 +1,13 @@
+//recursive vector 
+int sumVector(vector<int>::const_iterator start, vector<int>::const_iterator end , const vector<int>& a) {
+	if (start == end-1) return *start; 
+	vector<int>::const_iterator mid = start + (end - start) / 2;
+	return sumVector(start, mid, a) + sumVector(mid, end, a); 
+}
+
+//driver function 
+int sumVector(const vector<int>& a) { 
+	vector<int>::const_iterator itrStart = a.begin(); 
+	vector<int>::const_iterator itrEnd = a.end(); 
+	return sumVector(itrStart, itrEnd, a); //[left, right)
+}
