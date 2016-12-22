@@ -220,3 +220,63 @@ const Object & List<Object>::front( ) const{
     }
     return header->next->data;
 }
+template<class Object>
+void List<Object>::remove_adjacent_duplicates(){
+    Node* curr = header->next;
+    while(curr->next != nullptr){
+        if(curr->data == curr->next->data) {
+            Node* tmp = curr->next->next; 
+            delete curr->next;
+            curr->next = tmp;
+        } else {
+            curr = curr->next;
+        }
+    }
+}
+
+template<class Object>
+template<class Predicate>
+void List<Object>::remove_if(Predicate pred){
+    Node* curr = header;
+    while(curr->next != nullptr){
+        if(pred(curr->next->data)){
+            Node* tmp = curr->next->next; 
+            delete curr->next;
+            curr->next = tmp;
+        } else {
+            curr = curr->next; 
+        }
+    }
+}
+
+template<class Object>
+void List<Object>::merge(List<Object> & alist){
+    Node* curr1 = header->next;
+    Node* curr2 = alist.header->next;
+    Node* newList = new Node;
+    Node* start = newList;
+    while(curr1 != nullptr || curr2 != nullptr){
+        if(curr1 == nullptr){
+            newList->next = curr2; 
+            curr2 = curr2 -> next;
+        }
+        if(curr2 == nullptr){
+            newList->next = curr1; 
+            curr1 = curr1 -> next;
+        }
+        if(curr1 != nullptr && curr2 != nullptr){
+                if(curr1->data < curr2->data){
+                    newList->next = curr1;
+                    curr1 = curr1->next;
+                } else {
+                    newList->next = curr2; 
+                    curr2 = curr2->next;
+                }
+        }
+        
+        newList = newList->next;
+    }
+    delete header;
+    header = start;
+    alist.header->next = nullptr;
+}
