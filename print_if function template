@@ -1,0 +1,9 @@
+template<class Itr, class UnaryPred>
+void print_if(Itr start, Itr end, UnaryPred pred){
+    while(start != end){
+        if(pred(*start)){
+            cout << *start << ",";
+        } 
+        ++start;
+    }
+}
