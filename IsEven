@@ -1,0 +1,6 @@
+class isEven {
+public:
+	bool operator()(int n) {
+		return (n % 2) == 0;
+	}
+};
